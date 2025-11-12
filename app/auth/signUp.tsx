@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, User } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import React, { useContext, useState } from 'react';
 import {
@@ -9,53 +9,57 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import { auth, db } from '../../config/firebaseConfig';
 import Colors from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
 
 export default function SignUp() {
-  const [fullName, setFullName] = useState();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [loading, setLoading] = useState(false);
+  const [fullName, setFullName] = useState<string | undefined>(undefined);
+  const [email, setEmail] = useState<string | undefined>(undefined);
+  const [password, setPassword] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean>(false);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const router = useRouter();
+
   const CreateAccount = () => {
+    if (!email || !password) {
+      console.log('Email and password must be provided');
+      return;
+    }
     setLoading(true);
     console.log({ email });
     console.log({ password });
-    // return;
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (resp) => {
-        // Signed in user info
-        const user = resp.user;
+        const user: User = resp.user;
         console.log(user);
-        // Save user to database
         await SaveUser(user);
         setLoading(false);
       })
-      .catch((e) => {
+      .catch((e: Error) => {
         console.log(e.message);
         setLoading(false);
       });
   };
 
-  const SaveUser = async (user) => {
+  const SaveUser = async (user: User) => {
     const data = {
       name: fullName,
       email: email,
       member: false,
       uid: user?.uid,
     };
-    await setDoc(doc(db, 'users', email), data);
+    if (email) {
+      await setDoc(doc(db, 'users', email), data);
+    }
 
     setUserDetail(data);
 
-    // Navigate to New Screen
     router.replace('/auth/signIn');
   };
+
   return (
     <View
       style={{
@@ -85,17 +89,17 @@ export default function SignUp() {
         Create New Account
       </Text>
       <TextInput
-        onChangeText={(value) => setFullName(value)}
+        onChangeText={(value: string) => setFullName(value)}
         placeholder="Full Name"
         style={styles.textInput}
       />
       <TextInput
-        onChangeText={(value) => setEmail(value)}
+        onChangeText={(value: string) => setEmail(value)}
         placeholder="Email"
         style={styles.textInput}
       />
       <TextInput
-        onChangeText={(value) => setPassword(value)}
+        onChangeText={(value: string) => setPassword(value)}
         placeholder="Password"
         secureTextEntry={true}
         style={styles.textInput}

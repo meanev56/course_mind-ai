@@ -15,16 +15,20 @@ import { useRouter } from 'expo-router';
 import { auth, db } from './../../config/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import {UserDetailContext} from '../../context/UserDetailContext';
+import { UserDetailContext } from '../../context/UserDetailContext';
 
 export default function SignIn() {
   const router = useRouter();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState<string | undefined>(undefined);
+  const [password, setPassword] = useState<string | undefined>(undefined);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const onSignInClick = () => {
+    if (!email || !password) {
+      ToastAndroid.show('Email and password are required', ToastAndroid.BOTTOM);
+      return;
+    }
     setLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then(async (resp) => {
@@ -42,6 +46,7 @@ export default function SignIn() {
   };
 
   const getUserDetail = async () => {
+    if (!email) return;
     const user = await getDoc(doc(db, 'users', email));
     console.log(user.data());
     setUserDetail(user.data());
@@ -73,15 +78,15 @@ export default function SignIn() {
           marginTop: 20,
         }}
       >
-        Welcome Back
+        WelcomeBack
       </Text>
       <TextInput
-        onChangeText={(value) => setEmail(value)}
+        onChangeText={(value: string) => setEmail(value)}
         placeholder="Email"
         style={styles.textInput}
       />
       <TextInput
-        onChangeText={(value) => setPassword(value)}
+        onChangeText={(value: string) => setPassword(value)}
         placeholder="Password"
         secureTextEntry={true}
         style={styles.textInput}
@@ -89,7 +94,6 @@ export default function SignIn() {
       <TouchableOpacity
         onPress={onSignInClick}
         disabled={loading}
-
         style={{
           backgroundColor: Colors.PRIMARY,
           padding: 15,
@@ -98,16 +102,20 @@ export default function SignIn() {
           borderRadius: 10,
         }}
       >
-        {!loading? <Text
-          style={{
-            fontFamily: 'outfit',
-            fontSize: 20,
-            color: Colors.WHITE,
-            textAlign: 'center',
-          }}
-        >
-          Sign In
-        </Text> : <ActivityIndicator size={'small'} color={Colors.WHITE} />}
+        {!loading ? (
+          <Text
+            style={{
+              fontFamily: 'outfit',
+              fontSize: 20,
+              color: Colors.WHITE,
+              textAlign: 'center',
+            }}
+          >
+            Sign In
+          </Text>
+        ) : (
+          <ActivityIndicator size={'small'} color={Colors.WHITE} />
+        )}
       </TouchableOpacity>
       <View
         style={{ display: 'flex', flexDirection: 'row', gap: 5, marginTop: 20 }}
