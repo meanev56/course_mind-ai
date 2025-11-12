@@ -59,6 +59,21 @@ export default function Index() {
             Get Started
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push('/auth/signIn')}
+          style={[
+            styles.button,
+              {
+                backgroundColor: Colors.PRIMARY,
+                borderWidth: 1,
+                borderColor: Colors.WHITE,
+              },
+          ]}
+          >
+            <Text style={[styles.buttonText, { color: Colors.WHITE }]}>
+              Already have an Account?
+            </Text>
+        </TouchableOpacity>
 
       </View>
     </View>
