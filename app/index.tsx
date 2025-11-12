@@ -1,7 +1,10 @@
-import { Image, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Colors from "../constant/Colors";
 
 export default function Index() {
+  const router = useRouter();
+
   return (
     <View
       style={{
@@ -48,7 +51,30 @@ export default function Index() {
           with our AI-powered platform 📚📺
         </Text>
 
+        <TouchableOpacity
+          onPress={() => router.push('/auth/signUp')}
+          style={styles.button}
+        >
+          <Text style={[styles.buttonText, { color: Colors.PRIMARY }]}>
+            Get Started
+          </Text>
+        </TouchableOpacity>
+
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    padding: 15,
+    backgroundColor: Colors.WHITE,
+    marginTop: 20,
+    borderRadius: 10,
+  },
+  buttonText: {
+    textAlign: 'center',
+    fontSize: 18,
+    fontFamily: 'outfit',
+  },
+});
